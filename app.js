@@ -231,9 +231,14 @@ function feedback(resetFox = false) {
   const set = getSet();
   $('progress').textContent = 'Problem ' + (set.index + 1);
 }
+let displayedProblem;
 function showProblem(resetFox = false) {
   const set = getSet();
   const problem = current();
+  if (problem !== displayedProblem) {
+    moveHand(problem.terms[problem.blank === 0 ? 1 : 0]);
+    displayedProblem = problem;
+  }
   const tokens = [problem.terms[0], problem.operator, problem.terms[1], '=', problem.terms[2]];
   const spoken = [...tokens];
   spoken[problem.blank * 2] = 'blank';
