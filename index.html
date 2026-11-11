@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore clock arithmetic with a draggable clock and fox-guided practice.">
+<title>Fox Clock Lab</title>
+<link rel="icon" href="assets/fox-head-smiling.png">
+<link rel="stylesheet" href="style.css">
+<script src="workbook.js" defer></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<header class="top" id="site-header">
+  <div class="top-inner" id="header-link">
+    <a class="brand" href="https://jonathandoanephd.github.io/research-portfolio/curriculum-leadership/" aria-label="Fox Clock Lab · Curriculum Leadership portfolio"><img src="assets/fox-head-smiling.png" alt=""><span>Fox Clock Lab</span></a>
+  </div>
+  <button type="button" id="header-toggle" aria-label="Toggle portfolio header" aria-expanded="false" aria-controls="header-link"></button>
+</header>
+<main>
+  <section class="lab" aria-labelledby="lab-title">
+    <div class="instrument">
+      <h1 id="lab-title" class="tip" tabindex="0" data-tip="Drag the hand to explore what happens when numbers wrap around.">Clock arithmetic</h1>
+      <div class="clock-wrap">
+        <svg id="clock" viewBox="0 0 460 460" aria-label="Interactive clock face">
+          <defs>
+            <linearGradient id="hand-fill"><stop stop-color="#ff9d4d"/><stop offset="1" stop-color="#ffbc77"/></linearGradient>
+          </defs>
+          <circle cx="230" cy="230" r="188" fill="#fff" stroke="#789eb7" stroke-width="6"/>
+          <circle cx="230" cy="230" r="176" fill="none" stroke="#aac7d9" stroke-width="2"/>
+          <g id="marks"></g>
+          <g id="hand" role="slider" tabindex="0" aria-label="Hour hand" aria-valuemin="0" aria-valuenow="0">
+            <path class="hand-hit" d="M230 254V133" stroke="transparent" stroke-width="36"/>
+            <path d="M225 254L220 150L230 125L240 150L235 254Z" fill="url(#hand-fill)" stroke="#a44912" stroke-width="1.5"/>
+            <circle cx="230" cy="230" r="13" fill="#112a3e" stroke="#ffab61" stroke-width="4"/>
+            <circle cx="230" cy="230" r="4" fill="#ffbc77"/>
+          </g>
+        </svg>
+      </div>
+      <div class="readout" id="readout"></div>
+    </div>
+    <aside class="side">
+      <div class="controls">
+        <h2 class="tip" tabindex="0" data-tip="Choose how many hours are on the clock.">Build your clock</h2>
+        <select id="size" aria-label="Hours on the clock"></select>
+        <div class="toggles">
+          <label class="tip" data-tip="Zero and negative numbers"><input id="inner" type="checkbox" checked><strong>Inner labels</strong></label>
+          <label class="tip" data-tip="Numbers after one full turn"><input id="outer" type="checkbox"><strong>Outer labels</strong></label>
+        </div>
+      </div>
+    </aside>
+  </section>
+  <section class="practice" aria-labelledby="practice-title">
+    <div class="practice-head"><h2 id="practice-title" class="tip" tabindex="0" data-tip="Find the missing number using your clock.">Try a problem <span class="modulus"><span aria-hidden="true">·</span> Mod <span id="practice-modulus"></span></span></h2>
+    <div class="practice-options">
+      <label><input id="multiply" type="checkbox"> Multiplication</label>
+      <label class="tip" data-tip="On: find a missing number inside the equation. Off: find the result."><input id="missingNumber" type="checkbox"> Missing number</label>
+      <label><input id="sound" type="checkbox"> Sound</label>
+    </div></div>
+    <div class="exercise">
+      <div id="equation" class="equation"></div>
+      <form id="answers" novalidate>
+        <div class="session"><label for="initials" class="tip" data-tip="Optional. Leave blank to record the attempt as uninitialed.">Initials <input id="initials" maxlength="8" placeholder="e.g. JD" autocomplete="off" autocapitalize="characters"></label><button type="button" id="export" class="secondary"><span id="export-label" aria-live="polite">↓ Export Excel</span></button></div>
+        <div class="answer-fields">
+          <label class="tip" for="raw" data-tip="Enter any integer that lands on the right hour.">Regular answer</label>
+          <input id="raw" class="answer" type="text" autocomplete="off">
+          <span id="raw-light" class="lamp small" role="status" aria-label="Regular answer empty"></span>
+          <output id="conversion" for="raw" aria-live="polite">Wraps to …</output>
+          <label class="tip" for="modular" data-tip="Enter the answer within the clock’s range, starting at zero.">Modular answer</label>
+          <input id="modular" class="answer" type="text" inputmode="numeric" autocomplete="off">
+          <span id="mod-light" class="lamp" role="status" aria-label="Modular answer empty"></span>
+        </div>
+        <div id="fox" data-mood="curious" role="img" aria-label="Curious fox">
+          <img class="curious" src="assets/fox-head-howling-profile.png" alt="">
+          <img class="happy" src="assets/fox-head-smiling.png" alt="">
+          <img class="modular" src="assets/fox-head-smiling-profile.png" alt="">
+          <img class="retry" src="assets/fox-head-three-quarter-left.png" alt="">
+          <img class="sleep" src="assets/fox-sleeping-curled.png" alt="">
+        </div>
+      </form>
+    </div>
+    <div class="navigation"><button class="secondary" id="prev">← Previous</button><span id="progress" aria-live="polite"></span><button id="next" class="primary">Next problem →</button></div>
+  </section>
+  <p id="save-note" class="save-note" role="status" hidden></p>
+</main>
+</body>
+</html>
