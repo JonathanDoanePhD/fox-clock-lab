@@ -1,6 +1,6 @@
 :root{font-family:Inter,Arial,sans-serif;color:#112a3e;background:#f2f7fa;--navy:#112a3e;--blue:#006eb1;--muted:#526876;--line:#d9e6ed;--orange:#ffab61}
 *{box-sizing:border-box}
-body{margin:0;zoom:.925}
+body{margin:0;zoom:.94}
 button,input,select{font:inherit}
 button,select,input[type=checkbox]{cursor:pointer}
 button:focus-visible,#hand:focus-visible{outline:3px solid #1594d3;outline-offset:3px}
