@@ -3,7 +3,8 @@
 body{margin:0;zoom:.90}
 button,input,select{font:inherit}
 button,select,input[type=checkbox]{cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible,#hand:focus-visible{outline:3px solid #1594d3;outline-offset:3px}
+button:focus-visible,#hand:focus-visible{outline:3px solid #1594d3;outline-offset:3px}
+input:focus-visible,select:focus-visible{outline:1px solid #6aabc9;outline-offset:1px}
 button:disabled{opacity:.45;cursor:default}
 .top{background:white;border-bottom:1px solid var(--line)}
 .top-inner{max-width:1140px;margin:auto;padding:11px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px}
