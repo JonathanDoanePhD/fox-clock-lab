@@ -80,6 +80,8 @@ const current = () => getSet().problems[getSet().index];
 
 let hour = 0;
 let pointer = null;
+let sweepStart = 0;
+let sweepHours = 0;
 let labels = [];
 let sleeping = false;
 let sleepTimer;
@@ -135,7 +137,7 @@ function drawClock() {
     if (state.outer) svgElement('text', { x: x(205), y: y(205), class: 'outer-label' }, state.size + main);
   }
   $('hand').setAttribute('aria-valuemax', state.size - 1);
-  moveHand(hour);
+  settleSweep(sweepHours);
 }
 function rotateHand(degrees) {
   $('hand').setAttribute('transform', 'rotate(' + degrees + ' 230 230)');
@@ -149,6 +151,45 @@ function moveHand(value) {
   labels.forEach((label, index) => label.classList.toggle('active', index === hour));
   $('readout').textContent = main + ' o’clock · modular value ' + hour;
 }
+function sweepPoint(degrees, radius) {
+  const radians = degrees * Math.PI / 180;
+  return [230 + radius * Math.sin(radians), 230 - radius * Math.cos(radians)];
+}
+function renderSweep(degrees) {
+  const origin = 360 * sweepStart / state.size;
+  const magnitude = Math.min(Math.abs(degrees), 360);
+  const direction = Math.sign(degrees);
+  const radius = 170;
+  const start = sweepPoint(origin, radius);
+  const end = sweepPoint(origin + direction * magnitude, radius);
+  const sweepFlag = direction > 0 ? 1 : 0;
+  let path = '';
+  if (magnitude >= 360) {
+    const opposite = sweepPoint(origin + 180, radius);
+    path = `M ${start.join(' ')} A ${radius} ${radius} 0 0 ${sweepFlag} ${opposite.join(' ')} A ${radius} ${radius} 0 0 ${sweepFlag} ${start.join(' ')} Z`;
+  } else if (magnitude > 0.01) {
+    path = `M 230 230 L ${start.join(' ')} A ${radius} ${radius} 0 ${magnitude > 180 ? 1 : 0} ${sweepFlag} ${end.join(' ')} Z`;
+  }
+  $('sweep-shade').setAttribute('d', path);
+  const hours = direction * Math.round(Math.abs(degrees) * state.size / 360);
+  const [x, y] = sweepPoint(origin + direction * magnitude / 2, 90);
+  const label = $('sweep-label');
+  label.setAttribute('x', x);
+  label.setAttribute('y', y);
+  label.textContent = hours === 0 ? '' : String(hours).replace('-', '−');
+}
+function settleSweep(hours) {
+  sweepHours = hours;
+  moveHand(sweepStart + hours);
+  renderSweep(360 * hours / state.size);
+  if (hours) {
+    const hand = $('hand');
+    const direction = hours > 0 ? 'clockwise' : 'counterclockwise';
+    const count = Math.abs(hours);
+    hand.setAttribute('aria-valuetext', hand.getAttribute('aria-valuetext') +
+      ', moved ' + count + (count === 1 ? ' hour ' : ' hours ') + direction);
+  }
+}
 function pointerAngle(event) {
   const inverse = $('clock').getScreenCTM()?.inverse();
   if (!inverse) return;
@@ -158,32 +199,46 @@ function pointerAngle(event) {
   if (Math.hypot(dx, dy) < 10) return;
   return Math.atan2(dx, -dy) * 180 / Math.PI;
 }
+function updateDrag(event) {
+  const angle = pointerAngle(event);
+  if (angle === undefined) return;
+  // Unwrap each small change so crossing 12 or making a full turn preserves direction.
+  pointer.travel += mod(angle - pointer.lastAngle + 180, 360) - 180;
+  pointer.lastAngle = angle;
+  rotateHand(360 * sweepStart / state.size + pointer.travel);
+  renderSweep(pointer.travel);
+}
 $('hand').addEventListener('pointerdown', event => {
   if (pointer !== null || event.button !== 0) return;
   event.preventDefault();
-  pointer = event.pointerId;
-  $('hand').setPointerCapture(pointer);
+  pointer = {
+    id: event.pointerId,
+    lastAngle: pointerAngle(event) ?? 360 * hour / state.size,
+    travel: 360 * sweepHours / state.size
+  };
+  $('hand').setPointerCapture(pointer.id);
   $('hand').classList.add('dragging');
 });
 $('hand').addEventListener('pointermove', event => {
-  if (event.pointerId !== pointer) return;
-  const angle = pointerAngle(event);
-  if (angle !== undefined) rotateHand(angle);
+  if (event.pointerId === pointer?.id) updateDrag(event);
 });
 for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) {
   $('hand').addEventListener(name, event => {
-    if (event.pointerId !== pointer) return;
-    const angle = name === 'pointerup' ? pointerAngle(event) : undefined;
-    moveHand(angle === undefined ? hour : Math.round(angle * state.size / 360));
+    if (event.pointerId !== pointer?.id) return;
+    if (name === 'pointerup') {
+      updateDrag(event);
+      const steps = Math.sign(pointer.travel) * Math.round(Math.abs(pointer.travel) * state.size / 360);
+      settleSweep(steps);
+    } else settleSweep(sweepHours);
     pointer = null;
     $('hand').classList.remove('dragging');
   });
 }
 $('hand').addEventListener('keydown', event => {
-  const keys = { ArrowRight: hour + 1, ArrowDown: hour + 1, ArrowLeft: hour - 1, ArrowUp: hour - 1, Home: 0, End: state.size - 1 };
-  if (!Object.hasOwn(keys, event.key)) return;
+  const steps = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1, Home: -hour, End: state.size - 1 - hour };
+  if (!Object.hasOwn(steps, event.key)) return;
   event.preventDefault();
-  moveHand(keys[event.key]);
+  settleSweep(sweepHours + steps[event.key]);
 });
 
 function evaluate(problem, size, field) {
@@ -236,7 +291,8 @@ function showProblem(resetFox = false) {
   const set = getSet();
   const problem = current();
   if (problem !== displayedProblem) {
-    moveHand(problem.terms[problem.blank === 0 ? 1 : 0]);
+    sweepStart = mod(problem.terms[problem.blank === 0 ? 1 : 0], state.size);
+    settleSweep(0);
     displayedProblem = problem;
   }
   const tokens = [problem.terms[0], problem.operator, problem.terms[1], '=', problem.terms[2]];

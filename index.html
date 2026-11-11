@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ctext%20x%3D%2232%22%20y%3D%2232%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20font-size%3D%2254%22%3E%F0%9F%95%94%3C%2Ftext%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="style.css?v=667b38a">
 <script src="workbook.js" defer></script>
-<script src="app.js?v=dc9b24e" defer></script>
+<script src="app.js?v=sweep1" defer></script>
 </head>
 <body>
 <header class="top" id="site-header">
@@ -28,7 +28,9 @@
           </defs>
           <circle cx="230" cy="230" r="188" fill="#fff" stroke="#789eb7" stroke-width="6"/>
           <circle cx="230" cy="230" r="176" fill="none" stroke="#aac7d9" stroke-width="2"/>
+          <path id="sweep-shade" fill="#ffe6ce" pointer-events="none" aria-hidden="true"/>
           <g id="marks"></g>
+          <text id="sweep-label" fill="#84400f" font-size="26" font-weight="800" text-anchor="middle" dominant-baseline="central" pointer-events="none" aria-hidden="true"></text>
           <g id="hand" role="slider" tabindex="0" aria-label="Hour hand" aria-valuemin="0" aria-valuenow="0">
             <path class="hand-hit" d="M230 254V133" stroke="transparent" stroke-width="36"/>
             <path d="M225 254L220 150L230 125L240 150L235 254Z" fill="url(#hand-fill)" stroke="#a44912" stroke-width="1.5"/>
